@@ -20,26 +20,44 @@
 
 var MediaElementAudio = {
     Scope: function (elAudio, audioCtx, scope) {
-        if (myAudio.myAudio != undefined)
+        if (elAudio.myAudio != undefined)
             return;
-        elAudio.myAudio = {};
         elAudio.onplay = function () {
-            if (elAudio.myAudio.source != undefined)
-                return;
-
-            // Create a MediaElementAudioSourceNode
-            // Feed the HTMLMediaElement into it
-            elAudio.myAudio.source = audioCtx.createMediaElementSource(elAudio);
-
-            // Create a gain node
-            var gainNode = audioCtx.createGain();
-
-            // connect the AudioBufferSourceNode to the gainNode
-            // and the gainNode to the destination, so we can play the
-            // music and adjust the volume using the mouse cursor
-            elAudio.myAudio.source.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            elAudio.myAudio.source.connect(scope.input);
+            MediaElementAudio.Play(elAudio, audioCtx, scope);
         };
+    },
+    Play: function (elAudio, audioCtx, scope) {
+        if (elAudio.tagName.toUpperCase() != "AUDIO") {
+            consoleError('elAudio.tagName: ' + elAudio.tagName);
+            return;
+        }
+        if (scope == undefined) {
+            consoleError('scope: ' + scope);
+            return;
+        }
+        if (elAudio.myAudio == undefined)
+            elAudio.myAudio = {};
+        if (elAudio.myAudio.source != undefined)
+            return;
+        //Attention!!!
+        //I see:
+        // "MediaElementAudioSource outputs zeroes due to CORS access restrictions for file:///D:/My%20documents/MyProjects/trunk/WebFeatures/WebFeatures/GoogleSite/audioSynthesizer/audioSynthesizer/DST-Canopy.mp3 "
+        // message if I open
+        // file:///D:/My%20documents/MyProjects/trunk/WebFeatures/WebFeatures/GoogleSite/audioSynthesizer/audioSynthesizer/index.html
+        //web page. Please use a web server for open the index.html web page
+
+        // Create a MediaElementAudioSourceNode
+        // Feed the HTMLMediaElement into it
+        elAudio.myAudio.source = audioCtx.createMediaElementSource(elAudio);
+
+        // Create a gain node
+        var gainNode = audioCtx.createGain();
+
+        // connect the AudioBufferSourceNode to the gainNode
+        // and the gainNode to the destination, so we can play the
+        // music and adjust the volume using the mouse cursor
+        elAudio.myAudio.source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        elAudio.myAudio.source.connect(scope.input);
     }
 }
